@@ -1,5 +1,6 @@
 package dedeSecurity2.dedeSecurity2.securities;
 
+import dedeSecurity2.dedeSecurity2.entities.Jwt;
 import dedeSecurity2.dedeSecurity2.services.UtilisateurService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,6 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = null;
+        Jwt tokenDansLaBDD = null;
         String username = null;
         boolean isTokenExpired = true;
 
@@ -38,7 +40,11 @@ public class JwtFilter extends OncePerRequestFilter {
             username = jwtService.extractUsername(token);
         }
 
-        if (!isTokenExpired && username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (
+                !isTokenExpired
+                        && tokenDansLaBDD.getUtilisateur().getEmail().equals(username)
+                        && SecurityContextHolder.getContext().getAuthentication() == null
+        ) {
             UserDetails userDetails = utilisateurService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);

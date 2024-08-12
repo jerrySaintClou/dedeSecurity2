@@ -25,6 +25,14 @@ public class JwtService {
     private UtilisateurService utilisateurService;
     private JwtRepository jwtRepository;
 
+    public Jwt tokenByValue(String value) {
+        return this.jwtRepository.findByValeurAndDesactiveAndExpire(
+                value,
+                false,
+                false
+        ).orElseThrow(() -> new RuntimeException("Token invalide ou inconnu"));
+    }
+
 
     public Map<String, String> generate(String username) {
         Utilisateur utilisateur = this.utilisateurService.loadUserByUsername(username);
